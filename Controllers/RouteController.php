@@ -77,10 +77,11 @@ class RouteController
         require_once BASE_PATH . '/views/map.php';
     }
 
-  
+
     private function geocodificar($direccion, $ciudad)
     {
-        $direccionCompleta = $direccion . ', ' . $ciudad . ', Colombia';
+        $direccionLimpia = $this->limpiarDireccion($direccion);
+        $direccionCompleta = $direccionLimpia . ', ' . $ciudad . ', Colombia';
         $url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($direccionCompleta);
 
         $context = stream_context_create([
@@ -107,5 +108,25 @@ class RouteController
         }
 
         return null;
+    }
+
+    private function limpiarDireccion($direccion)
+    {
+        $patrones = [
+            '/\bTORRE\b.*$/i',
+            '/\bTOR\b.*$/i',
+            '/\bAPTO\b.*$/i',
+            '/\bAPARTAMENTO\b.*$/i',
+            '/\bINT\b.*$/i',
+            '/\bINTERIOR\b.*$/i',
+            '/\bPISO\b.*$/i',
+            '/\bBLOQUE\b.*$/i',
+            '/\bCONJ\b.*$/i',
+            '/\bCONJUNTO\b.*$/i',
+            '/\bMZ\b.*$/i',
+            '/\bMANZANA\b.*$/i'
+        ];
+
+        return trim(preg_replace($patrones, '', $direccion));
     }
 }
